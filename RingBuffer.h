@@ -10,19 +10,14 @@ class RingBuffer {
 
 	public:
 		char ringVariable[RINGBUFFLENGTH];
-		char temporaryVariable[RINGBUFFSIZE];
-		char *readout;
 		
-		volatile unsigned int head, tail;
-		
-		RingBuffer(void) {
-			readout = temporaryVariable;
-			head = tail = 0;
-		}
+		unsigned int head, tail;
 		
 		uint32_t write(char in);
+		uint32_t writeBytes(char in[], int length);
 		uint32_t writeString(char in[]);
 		uint32_t read(char *out);
+		uint32_t readBytes(char *out, int length);
 		uint32_t readString(char *out);
 };
 

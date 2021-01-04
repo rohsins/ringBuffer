@@ -9,6 +9,17 @@ uint32_t RingBuffer::write(char in) {
 		return 0;
 }
 
+uint32_t RingBuffer::writeBytes(char in[], int length) {
+	for (int i = 0; i < length; i++) {
+		if (head == ((tail - 1 + RINGBUFFLENGTH) % RINGBUFFLENGTH)) {
+			return 1;
+		}
+		ringVariable[head] = in[i];
+		head = (head + 1) % RINGBUFFLENGTH;
+	}
+	return 0;
+}
+
 uint32_t RingBuffer::writeString(char in[]) {
 	int charinc = 0;
 	while (in[charinc])	{
@@ -29,6 +40,18 @@ uint32_t RingBuffer::read(char *out) {
 		ringVariable[tail] = 0;
 		tail = ((tail + 1) % RINGBUFFLENGTH);
 		return 0;
+}
+
+uint32_t RingBuffer::readBytes(char *out, int length) {
+	if (head == tail) {
+		return 1;
+	}
+	for (int i = 0; i < length; i++) {
+		out[i]=ringVariable[tail];
+		ringVariable[tail] = 0;
+		tail = ((tail + 1) % RINGBUFFLENGTH);
+	}
+	return 0;
 }
 
 uint32_t RingBuffer::readString(char *out) {
