@@ -11,7 +11,7 @@ class RingBuffer {
 		volatile unsigned int head, tail;
 
 	public:
-		int getDataLength (void) {
+		inline int dataLength (void) {
 			if (head > tail) { return (head - tail); }
 			else if (head < tail) { return ((size - tail) + head); }
 			else { return 0; }
