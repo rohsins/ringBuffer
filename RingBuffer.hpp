@@ -1,7 +1,12 @@
+/*
+	Author: Rohit Singh (rohsins@gmail.com)
+*/
+
 #ifndef _RingBuffer_H_
 #define _RingBuffer_H_
 
 #include <stdint.h>
+#include <string.h>
 
 template <typename T, int size>
 class RingBuffer {
@@ -71,18 +76,39 @@ class RingBuffer {
 			return 0;
 		}
 
-		uint8_t read (T *out, T delimiter) {
-			int tempCounter = 0;
+		int read (T *out, T delimiter) {
+			volatile int tempCounter = 0;
+			const int tempTail = tail;
+			
 			while (ringVariable[tail] != delimiter) {
 				if (head == tail) {
-					return 1;
+					tail = tempTail;
+					return -1;
 				}
-				out[tempCounter]=ringVariable[tail];
-				ringVariable[tail] = 0;
+				
 				tempCounter++;
 				tail = ((tail + 1) % RINGBUFFLENGTH);
 			}
-			return 0;
+			
+			{
+				tempCounter++;
+				tail = ((tail + 1) % RINGBUFFLENGTH);
+				
+				if ((tempTail + tempCounter) < RINGBUFFLENGTH) {
+					memcpy((T *) (out), (T *) (ringVariable + tempTail), tempCounter);
+					memset((T *) (ringVariable + tempTail), 0, tempCounter);
+				} else {
+					const int buffPosteriorEnd= RINGBUFFLENGTH - tempTail;
+					const int buffAnteriorEnd = tempCounter - buffPosteriorEnd;
+					
+					memcpy((T *) (out), (T *) (ringVariable + tempTail), buffPosteriorEnd);
+					memcpy((T *) (out + buffPosteriorEnd), (T *) (ringVariable), buffAnteriorEnd);
+					
+					memset((T *) (ringVariable + tempTail), 0, buffPosteriorEnd);
+					memset((T *) (ringVariable), 0, buffAnteriorEnd);
+				}
+			}
+			return tempCounter;
 		}
 };
 
