@@ -110,6 +110,17 @@ class RingBuffer {
 			}
 			return tempCounter;
 		}
+		
+		uint8_t drop (int length) {
+			if (head == tail) {
+				return 1;
+			}
+			for (int i = 0; i < length; i++) {
+				ringVariable[tail] = 0;
+				tail = ((tail + 1) % RINGBUFFLENGTH);
+			}
+			return 0;
+		}
 };
 
 #endif
