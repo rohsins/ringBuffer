@@ -1,0 +1,4 @@
+version: "1.0.0"
+description: "This is a RingBuffer component"
+url: "https://github.com/rohsins/ringBuffer"
+license: "MIT"
